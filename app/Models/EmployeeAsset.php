@@ -39,6 +39,7 @@ class EmployeeAsset extends Model
         'monitor',
         'tahun_pembelian',
         'serial_number',
+        'location',
         'condition',
         'assigned_at',
         'notes',

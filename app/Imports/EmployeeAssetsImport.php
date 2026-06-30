@@ -32,6 +32,7 @@ class EmployeeAssetsImport implements ToModel, WithHeadingRow, WithValidation, S
             'brand'           => $row['brand'] ?? null,
             'model'           => $row['model'] ?? null,
             'serial_number'   => $row['serial_number'] ?? null,
+            'location'        => $row['lokasi'] ?? null,
             'os'              => $row['os'] ?? null,
             'processor'       => $row['processor'] ?? null,
             'mainboard'       => $row['mainboard'] ?? null,

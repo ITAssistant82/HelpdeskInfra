@@ -11,11 +11,11 @@ class TicketLayerSeeder extends Seeder
     {
         $layers = [
             // IT Infra — 3 layer escalation
-            ['name' => 'IT Infra L1', 'role_name' => 'it_infra_l1', 'level' => 1, 'escalation_hours' => 4,  'team_key' => 'IT_INFRA'],
-            ['name' => 'IT Infra L2', 'role_name' => 'it_infra_l2', 'level' => 2, 'escalation_hours' => 8,  'team_key' => 'IT_INFRA'],
-            ['name' => 'IT Infra L3', 'role_name' => 'it_infra_l3', 'level' => 3, 'escalation_hours' => null,'team_key' => 'IT_INFRA'],
+            ['name' => 'L1 IT Infra', 'role_name' => 'it_infra_l1', 'level' => 1, 'escalation_hours' => 1,  'team_key' => 'it_infra'],
+            ['name' => 'L2 IT Infra', 'role_name' => 'it_infra_l2', 'level' => 2, 'escalation_hours' => 2,  'team_key' => 'it_infra'],
+            ['name' => 'L3 IT Infra', 'role_name' => 'it_infra_l3', 'level' => 3, 'escalation_hours' => null,'team_key' => 'it_infra'],
 
-            // Helpdesk — single layer (no escalation)
+            // Helpdesk — single layer, redirected to IT Infra via category
             ['name' => 'Helpdesk L1',   'role_name' => 'helpdesk_l1', 'level' => 1, 'escalation_hours' => null, 'team_key' => 'HELPDESK'],
 
             // Network — single layer

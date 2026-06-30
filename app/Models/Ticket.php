@@ -167,6 +167,20 @@ class Ticket extends Model
         return 'on_track';
     }
 
+    public function isOutsideWorkingHours(): bool
+    {
+        $created = $this->created_at;
+        if (!$created) return false;
+
+        if ($created->isWeekend()) return true;
+
+        $hour = (int) $created->format('H');
+        $minute = (int) $created->format('i');
+        $time = $hour * 60 + $minute;
+
+        return $time < 8 * 60 || $time >= 17 * 60;
+    }
+
     public static function calculatePriority(string $impact, string $urgency): string
     {
         $matrix = [
@@ -244,6 +258,14 @@ class Ticket extends Model
                         ));
                     }
                 }
+            }
+
+            if ($ticket->isOutsideWorkingHours()) {
+                $ticket->activities()->create([
+                    'user_id' => null,
+                    'action' => 'system',
+                    'description' => 'Tiket masuk di luar jam kerja (Senin-Jumat 08:00-17:00). Akan diproses pada jam kerja berikutnya.',
+                ]);
             }
 
             static::notifyTeam("Tiket baru: {$ticket->ticket_number} - {$ticket->title}", $ticket);

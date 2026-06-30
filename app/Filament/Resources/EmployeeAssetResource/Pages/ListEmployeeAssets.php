@@ -17,8 +17,8 @@ class ListEmployeeAssets extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\Action::make('print_all_stickers')->label('Cetak All Stiker (PDF)')->icon('heroicon-o-tag')->color('danger')->url(route('assets.barcode.print-stickers'))->openUrlInNewTab(),
-            Actions\Action::make('print_all_stickers_word')->label('Cetak All Stiker (Word)')->icon('heroicon-o-document')->color('warning')->url(route('assets.barcode.print-stickers-word'))->openUrlInNewTab(),
+            Actions\Action::make('print_all_stickers')->label('Cetak All Stiker')->icon('heroicon-o-tag')->color('danger')->url(route('assets.barcode.print-stickers'))->openUrlInNewTab(),
+            // Actions\Action::make('print_all_stickers_word')->label('Cetak All Stiker (Word)')->icon('heroicon-o-document')->color('warning')->url(route('assets.barcode.print-stickers-word'))->openUrlInNewTab(),
             Actions\Action::make('export')->label('Export Excel')->icon('heroicon-o-arrow-down-tray')->color('success')->action(function () {
                 return Excel::download(new EmployeeAssetsExport(), 'employee_assets.xlsx');
             }),

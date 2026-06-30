@@ -24,14 +24,21 @@ class AutoEscalateTickets extends Command
 
             $tickets = Ticket::where('current_layer', $layer->level)
                 ->where('team_key', $layer->team_key)
-                ->whereNotIn('status', ['Solved', 'Closed', 'Rejected/Out of Scope'])
+                ->where('status', 'New')
                 ->where('current_layer_entered_at', '<=', now()->subHours($layer->escalation_hours))
                 ->get();
 
             foreach ($tickets as $ticket) {
+                $this->info("Escalating ticket {$ticket->ticket_number} from {$layer->name} to {$nextLayer->name}");
+
+                $ticket->activities()->create([
+                    'user_id' => null,
+                    'action' => 'system',
+                    'description' => "Tiket otomatis dinaikkan ke {$nextLayer->name} karena melebihi batas waktu {$layer->escalation_hours} jam di {$layer->name}",
+                ]);
+
                 $ticket->escalateToNextLayer();
                 $escalated++;
-                $this->info("Ticket {$ticket->ticket_number} auto-escalated from {$layer->name} to {$nextLayer->name}");
             }
         }
 

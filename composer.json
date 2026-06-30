@@ -88,8 +88,8 @@
     },
     "config": {
         "optimize-autoloader": true,
-        "preferred-install": "dist",
         "sort-packages": true,
+        "source-fallback": true,
         "allow-plugins": {
             "pestphp/pest-plugin": true,
             "php-http/discovery": true

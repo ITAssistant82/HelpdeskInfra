@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\TicketResource\Pages;
 
 use App\Filament\Resources\TicketResource;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Facades\Storage;
 
@@ -39,6 +40,14 @@ class CreateTicket extends CreateRecord
         foreach ($this->uploadedFiles as $path) {
             $fullPath = Storage::disk('public')->path($path);
             $this->record->attachments()->create(['user_id' => auth()->id(), 'file_path' => $path, 'file_name' => basename($path), 'file_size' => file_exists($fullPath) ? filesize($fullPath) : 0, 'mime_type' => file_exists($fullPath) ? mime_content_type($fullPath) : 'application/octet-stream', ]);
+        }
+
+        if ($this->record->isOutsideWorkingHours()) {
+            Notification::make()
+                ->warning()
+                ->title('Tiket di Luar Jam Kerja')
+                ->body('Tiket Anda akan diproses pada jam kerja Senin-Jumat 08:00-17:00.')
+                ->send();
         }
     }
     protected function getRedirectUrl(): string

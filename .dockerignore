@@ -1,0 +1,14 @@
+.git
+.gitignore
+.env
+.vagrant
+node_modules
+vendor
+bootstrap/cache
+.dockerignore
+docker-compose.yml
+Dockerfile
+*.md
+.gitattributes
+composer.phar
+webpack.mix.js
