@@ -9,8 +9,9 @@ use Filament\Resources\Pages\EditRecord;
 class EditEmployeeAsset extends EditRecord
 {
     protected static string $resource = EmployeeAssetResource::class;
+
     protected function getHeaderActions(): array
     {
-        return [Actions\DeleteAction::make(), ];
+        return [Actions\DeleteAction::make()];
     }
 }

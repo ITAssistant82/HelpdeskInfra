@@ -6,6 +6,7 @@ use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -62,6 +63,13 @@ class User extends Authenticatable implements FilamentUser
     public function assignedTickets(): HasMany
     {
         return $this->hasMany(Ticket::class, 'assigned_to');
+    }
+
+    public function helperTickets(): BelongsToMany
+    {
+        return $this->belongsToMany(Ticket::class, 'ticket_helpers', 'user_id', 'ticket_id')
+            ->withTimestamps()
+            ->withPivot('added_by');
     }
 
     public function isStaff(): bool

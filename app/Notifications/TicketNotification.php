@@ -28,11 +28,13 @@ class TicketNotification extends Notification
             'assigned' => "Ditugaskan: {$this->ticket->ticket_number}",
             'escalation' => "Eskalasi: {$this->ticket->ticket_number}",
             'approval' => "Persetujuan: {$this->ticket->ticket_number}",
+            'helper' => "Summon: {$this->ticket->ticket_number}",
             'status_team', 'status' => "Status Berubah: {$this->ticket->ticket_number}",
             default => "Notifikasi: {$this->ticket->ticket_number}",
         };
 
         return [
+            'format' => 'filament',
             'title' => $title,
             'body' => $this->message,
             'ticket_id' => $this->ticket->id,

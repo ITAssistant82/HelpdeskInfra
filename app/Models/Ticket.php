@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Notifications\TicketNotification;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Notification;
@@ -88,6 +89,44 @@ class Ticket extends Model
     {
         return $this->belongsTo(TicketLayer::class, 'current_layer', 'level')
             ->whereColumn('team_key', 'tickets.team_key');
+    }
+
+    public function helpers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'ticket_helpers', 'ticket_id', 'user_id')
+            ->withTimestamps()
+            ->withPivot('added_by');
+    }
+
+    public function addHelper(User $user): void
+    {
+        $exists = $this->helpers()->where('user_id', $user->id)->exists();
+        if ($exists) return;
+
+        $this->helpers()->attach($user->id, ['added_by' => auth()->id()]);
+
+        $this->activities()->create([
+            'user_id' => auth()->id(),
+            'action' => 'system',
+            'description' => "Menambahkan {$user->name} sebagai pembantu",
+        ]);
+
+        Notification::send($user, new \App\Notifications\TicketNotification(
+            ticket: $this,
+            message: "Anda di-summon untuk membantu tiket {$this->ticket_number} oleh " . (auth()->user()?->name ?? 'System'),
+            type: 'helper',
+        ));
+    }
+
+    public function removeHelper(User $user): void
+    {
+        $this->helpers()->detach($user->id);
+
+        $this->activities()->create([
+            'user_id' => auth()->id(),
+            'action' => 'system',
+            'description' => "Menghapus {$user->name} dari pembantu",
+        ]);
     }
 
     public function nextLayer(): ?TicketLayer
@@ -179,6 +218,42 @@ class Ticket extends Model
         $time = $hour * 60 + $minute;
 
         return $time < 8 * 60 || $time >= 17 * 60;
+    }
+
+    public static function businessHoursElapsed(\Carbon\Carbon $from): float
+    {
+        $now = now();
+        if ($from->gte($now)) return 0;
+
+        $hours = 0;
+        $current = $from->copy();
+
+        while ($current->lt($now)) {
+            if ($current->isWeekend()) {
+                $current->startOfDay()->addDay();
+                continue;
+            }
+
+            $dayStart = $current->copy()->setTime(8, 0);
+            $dayEnd = $current->copy()->setTime(17, 0);
+
+            if ($current->lt($dayStart)) {
+                $current = $dayStart;
+                continue;
+            }
+
+            $segmentEnd = $now->lt($dayEnd) ? $now : $dayEnd;
+            if ($current->lt($segmentEnd)) {
+                $hours += $current->diffInMinutes($segmentEnd) / 60;
+            }
+
+            $current = $dayEnd;
+            if ($current->lt($now)) {
+                $current->startOfDay()->addDay();
+            }
+        }
+
+        return round($hours, 2);
     }
 
     public static function calculatePriority(string $impact, string $urgency): string

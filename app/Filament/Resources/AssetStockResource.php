@@ -4,21 +4,29 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\AssetStockResource\Pages;
 use App\Models\AssetStock;
+use Filament\Actions;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Schemas;
 use Filament\Schemas\Schema;
-use Filament\Actions;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class AssetStockResource extends Resource
 {
-    protected static ?string $model = \App\Models\AssetStock::class;
+    protected static ?string $model = AssetStock::class;
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-archive-box';
+
     protected static ?string $navigationLabel = 'Stock Asset';
+
     protected static string|\UnitEnum|null $navigationGroup = 'Employees';
+
     protected static ?int $navigationSort = 2;
+
     public static function form(Schema $schema): Schema
     {
         return $schema->columns(1)->schema([
@@ -27,15 +35,17 @@ class AssetStockResource extends Resource
                 ->schema([
                     Forms\Components\TextInput::make('asset_code')
                         ->label('Asset Code')->required()->columnSpanFull()->default(function () {
-                            $lastCode = \Illuminate\Support\Facades\DB::table('asset_stocks')->orderBy('id', 'desc')->value('asset_code');
+                            $lastCode = DB::table('asset_stocks')->orderBy('id', 'desc')->value('asset_code');
                             if ($lastCode) {
                                 preg_match('/(\d+)$/', $lastCode, $matches);
                                 if ($matches) {
                                     $num = (int) $matches[1];
                                     $prefix = substr($lastCode, 0, -strlen($matches[1]));
-                                    return $prefix . str_pad($num + 1, strlen($matches[1]), '0', STR_PAD_LEFT);
+
+                                    return $prefix.str_pad($num + 1, strlen($matches[1]), '0', STR_PAD_LEFT);
                                 }
                             }
+
                             return 'STK-00001';
                         }),
                     Forms\Components\TextInput::make('asset_type')
@@ -74,22 +84,27 @@ class AssetStockResource extends Resource
                 ]),
         ]);
     }
+
     public static function canViewAny(): bool
     {
-        return auth()->user()?->can('view_any_asset_stock') ?? false;
+        return Auth::user()?->can('view_any_asset_stock') ?? false;
     }
+
     public static function canCreate(): bool
     {
-        return auth()->user()?->can('create_asset_stock') ?? false;
+        return Auth::user()?->can('create_asset_stock') ?? false;
     }
-    public static function canEdit($record): bool
+
+    public static function canEdit(Model $record): bool
     {
-        return auth()->user()?->can('view_any_asset_stock') ?? false;
+        return Auth::user()?->can('view_any_asset_stock') ?? false;
     }
-    public static function canDelete($record): bool
+
+    public static function canDelete(Model $record): bool
     {
-        return auth()->user()?->can('view_any_asset_stock') ?? false;
+        return Auth::user()?->can('view_any_asset_stock') ?? false;
     }
+
     public static function table(Table $table): Table
     {
         return $table->defaultSort('created_at', 'desc')
@@ -125,12 +140,14 @@ class AssetStockResource extends Resource
                 ]),
             ]);
     }
+
     public static function getRelations(): array
     {
         return [];
     }
+
     public static function getPages(): array
     {
-        return ['index' => Pages\ListAssetStocks::route('/'), 'create' => Pages\CreateAssetStock::route('/create'), 'edit' => Pages\EditAssetStock::route('/{record}/edit'), ];
+        return ['index' => Pages\ListAssetStocks::route('/'), 'create' => Pages\CreateAssetStock::route('/create'), 'edit' => Pages\EditAssetStock::route('/{record}/edit')];
     }
 }

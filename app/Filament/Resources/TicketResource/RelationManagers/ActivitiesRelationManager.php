@@ -5,18 +5,22 @@ namespace App\Filament\Resources\TicketResource\RelationManagers;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
 
 class ActivitiesRelationManager extends RelationManager
 {
     protected static string $relationship = 'activities';
+
     protected static ?string $recordTitleAttribute = 'id';
+
     protected static bool $isLazy = false;
 
     public static function canViewForRecord($ownerRecord, ?string $pageClass = null): bool
     {
-        if (! auth()->user()?->isStaff()) {
+        if (! Auth::user()?->isStaff()) {
             return false;
         }
+
         return parent::canViewForRecord($ownerRecord, $pageClass ?? static::class);
     }
 

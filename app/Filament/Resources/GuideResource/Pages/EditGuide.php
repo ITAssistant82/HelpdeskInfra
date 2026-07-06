@@ -9,8 +9,9 @@ use Filament\Resources\Pages\EditRecord;
 class EditGuide extends EditRecord
 {
     protected static string $resource = GuideResource::class;
+
     protected function getHeaderActions(): array
     {
-        return [Actions\DeleteAction::make(), Actions\ForceDeleteAction::make(), Actions\RestoreAction::make(), ];
+        return [Actions\DeleteAction::make(), Actions\ForceDeleteAction::make(), Actions\RestoreAction::make()];
     }
 }

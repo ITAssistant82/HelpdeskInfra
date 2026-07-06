@@ -25,8 +25,8 @@ class AutoEscalateTickets extends Command
             $tickets = Ticket::where('current_layer', $layer->level)
                 ->where('team_key', $layer->team_key)
                 ->where('status', 'New')
-                ->where('current_layer_entered_at', '<=', now()->subHours($layer->escalation_hours))
-                ->get();
+                ->get()
+                ->filter(fn ($ticket) => $ticket->current_layer_entered_at && Ticket::businessHoursElapsed($ticket->current_layer_entered_at) >= $layer->escalation_hours);
 
             foreach ($tickets as $ticket) {
                 $this->info("Escalating ticket {$ticket->ticket_number} from {$layer->name} to {$nextLayer->name}");

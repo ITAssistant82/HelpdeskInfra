@@ -9,8 +9,11 @@ use Filament\Tables\Table;
 class TicketApprovalsRelationManager extends RelationManager
 {
     protected static string $relationship = 'ticketApprovals';
+
     protected static ?string $recordTitleAttribute = 'id';
+
     protected static bool $isLazy = false;
+
     public function table(Table $table): Table
     {
         return $table->heading('Progres Persetujuan')->columns([Tables\Columns\TextColumn::make('sequence_order')->label('Urutan')->badge()->color('gray'), Tables\Columns\TextColumn::make('approver.name')->label('Approver'), Tables\Columns\TextColumn::make('status')->label('Status')->badge()->color(fn ($state) => match ($state) {

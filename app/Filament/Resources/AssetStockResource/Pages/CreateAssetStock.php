@@ -24,7 +24,7 @@ class CreateAssetStock extends CreateRecord
                 if ($matches) {
                     $num = (int) $matches[1];
                     $prefix = substr($lastCode, 0, -strlen($matches[1]));
-                    $data['asset_code'] = $prefix . str_pad($num + 1, strlen($matches[1]), '0', STR_PAD_LEFT);
+                    $data['asset_code'] = $prefix.str_pad($num + 1, strlen($matches[1]), '0', STR_PAD_LEFT);
                 } else {
                     $data['asset_code'] = 'STK-00001';
                 }
@@ -32,6 +32,7 @@ class CreateAssetStock extends CreateRecord
                 $data['asset_code'] = 'STK-00001';
             }
         }
+
         return $data;
     }
 }

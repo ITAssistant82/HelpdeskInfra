@@ -9,8 +9,9 @@ use Filament\Resources\Pages\EditRecord;
 class EditTicketCategory extends EditRecord
 {
     protected static string $resource = TicketCategoryResource::class;
+
     protected function getHeaderActions(): array
     {
-        return [Actions\DeleteAction::make(), ];
+        return [Actions\DeleteAction::make()];
     }
 }

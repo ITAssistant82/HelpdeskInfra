@@ -16,11 +16,12 @@ class EditUser extends EditRecord
             $data['password'] = $data['new_password'];
         }
         unset($data['new_password']);
+
         return $data;
     }
 
     protected function getHeaderActions(): array
     {
-        return [Actions\DeleteAction::make(), ];
+        return [Actions\DeleteAction::make()];
     }
 }

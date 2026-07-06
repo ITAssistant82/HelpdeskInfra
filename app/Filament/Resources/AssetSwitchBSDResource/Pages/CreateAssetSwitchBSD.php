@@ -8,11 +8,14 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateAssetSwitchBSD extends CreateRecord
 {
     protected static string $resource = AssetSwitchBSDResource::class;
+
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        $data ['location'] = 'BSD';
+        $data['location'] = 'BSD';
+
         return $data;
     }
+
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');

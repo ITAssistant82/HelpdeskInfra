@@ -9,8 +9,9 @@ use Filament\Resources\Pages\EditRecord;
 class EditAssetSwitchBSD extends EditRecord
 {
     protected static string $resource = AssetSwitchBSDResource::class;
+
     protected function getHeaderActions(): array
     {
-        return [Actions\DeleteAction::make(), ];
+        return [Actions\DeleteAction::make()];
     }
 }
