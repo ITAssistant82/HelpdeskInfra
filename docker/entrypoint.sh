@@ -8,8 +8,8 @@ if [ ! -f .env ]; then
     cp .env.example .env
 fi
 
-echo "Generate APP_KEY..."
-php artisan key:generate --force
+echo "Generate APP_KEY (hanya jika belum ada)..."
+php artisan key:generate
 
 echo "Menunggu MySQL..."
 DB_HOST="${DB_HOST:-mysql}"
