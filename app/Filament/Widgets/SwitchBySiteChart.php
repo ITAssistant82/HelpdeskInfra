@@ -2,7 +2,7 @@
 
 namespace App\Filament\Widgets;
 
-use App\Models\ASsetswitch;
+use App\Models\AssetSwitch;
 use Filament\Widgets\ChartWidget;
 
 class SwitchBySiteChart extends ChartWidget

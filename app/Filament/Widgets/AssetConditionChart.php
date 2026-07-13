@@ -2,7 +2,7 @@
 
 namespace App\Filament\Widgets;
 
-use App\Models\Employeeasset;
+use App\Models\EmployeeAsset;
 use Filament\Widgets\ChartWidget;
 
 class AssetConditionChart extends ChartWidget

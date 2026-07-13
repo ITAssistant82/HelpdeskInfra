@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Spatie\Permission\Models\Role;
 
 class MicrosoftController extends Controller
 {
@@ -89,9 +90,40 @@ class MicrosoftController extends Controller
             $user->update(['microsoft_id' => $microsoftUser['id']]);
         }
 
-        Auth::login($user);
-        $request->session()->save();
+        // Pastikan user hasil SSO memiliki minimal role panel agar tidak terpental ke login lagi.
+        $panelRoles = [
+            'super_admin',
+            'admin',
+            'user',
+            'helpdesk_l1',
+            'it_infra_l1',
+            'it_infra_l2',
+            'it_infra_l3',
+            'network_team',
+            'm365_team',
+            'security_soc',
+            'approver',
+        ];
 
-        return redirect()->intended('/admin');
+        if (! $user->hasAnyRole($panelRoles)) {
+            $role = Role::firstOrCreate([
+                'name' => 'user',
+                'guard_name' => 'web',
+            ]);
+
+            $user->assignRole($role);
+        }
+
+        Auth::login($user);
+        $request->session()->regenerate();
+
+        Log::info('Microsoft SSO login success', [
+            'user_id' => $user->id,
+            'email' => $user->email,
+            'roles' => $user->roles()->pluck('name')->toArray(),
+            'auth_check' => Auth::check(),
+        ]);
+
+        return redirect('/admin');
     }
 }

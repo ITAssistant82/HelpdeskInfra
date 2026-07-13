@@ -2,7 +2,7 @@
 
 namespace App\Filament\Widgets;
 
-use App\Models\ASsetaccesspointitem;
+use App\Models\AssetAccessPointItem;
 use Filament\Widgets\ChartWidget;
 
 class AccessPointBySiteChart extends ChartWidget
