@@ -28,6 +28,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->favicon(asset('images/Logo_Infra.png') . '?v=' . filemtime(public_path('images/Logo_Infra.png')))
             ->brandName('InfraDesk')
             ->brandLogo(fn () => view('components.brand-logo'))
             ->brandLogoHeight('3rem')
