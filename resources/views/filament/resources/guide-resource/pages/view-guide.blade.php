@@ -19,7 +19,6 @@
                             {{ $record->category }}
                         </span>
                     @endif
-                    <span class="text-xs text-gray-500">{{ $record->created_at?->format('d F Y') }}</span>
                 </div>
 
                 <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white leading-tight mb-8">

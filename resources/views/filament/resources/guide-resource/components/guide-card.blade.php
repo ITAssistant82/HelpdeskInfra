@@ -22,10 +22,7 @@
             {{ $record->title }}
         </h3>
 
-        <div class="pt-4 border-t border-gray-100 dark:border-gray-700/60 flex items-center justify-between">
-            <span class="text-xs text-gray-400">
-                {{ $record->created_at?->format('d M Y') }}
-            </span>
+        <div class="pt-4 border-t border-gray-100 dark:border-gray-700/60 flex items-center justify-end">
             <span class="text-xs font-semibold text-primary-600 dark:text-primary-400">
                 Baca
             </span>
