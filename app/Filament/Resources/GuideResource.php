@@ -12,6 +12,7 @@ use Filament\Tables;
 use Filament\Tables\Columns\Layout\View as LayoutView;
 use Filament\Tables\Table;
 use Illuminate\Auth\Access\Response;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
@@ -58,7 +59,19 @@ class GuideResource extends Resource
 
     public static function canView(Model $record): bool
     {
-        return static::canAccess();
+        return static::canAccess()
+            && (Auth::user()?->isStaff() || $record->is_active);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+
+        if (! Auth::user()?->isStaff()) {
+            $query->where('is_active', true);
+        }
+
+        return $query;
     }
 
     public static function getCreateAuthorizationResponse(): Response
