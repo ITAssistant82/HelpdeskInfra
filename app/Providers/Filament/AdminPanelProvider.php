@@ -41,6 +41,7 @@ class AdminPanelProvider extends PanelProvider
                 'Asset Switch',
                 'Asset Access Point',
                 'Ticketing',
+                'Renewal',
                 'Settings',
             ])
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')

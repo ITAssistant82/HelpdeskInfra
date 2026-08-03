@@ -10,3 +10,4 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('tickets:auto-escalate')->everyMinute();
+Schedule::command('renewal:auto-status')->daily();
