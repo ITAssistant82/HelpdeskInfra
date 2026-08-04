@@ -46,13 +46,13 @@
                                 <div class="mb-6 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
                                     <div class="flex items-center justify-end gap-2 px-4 py-2 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
                                         <a href="{{ $fileUrl }}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-600 text-white hover:bg-red-500">
-                                            👁 Pratinjau
+                                            &#128065;&#65039; Pratinjau
                                         </a>
                                         <a href="{{ $fileUrl }}" download class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white hover:bg-blue-500">
-                                            ⬇ Unduh
+                                            &#11015;&#65039; Unduh
                                         </a>
                                         {{-- <button onclick="window.open('{{ $fileUrl }}', '_blank')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white hover:bg-blue-500" btnprimary>
-                                            ⬇ Unduh
+                                            &#11015;&#65039; Unduh
                                         </button> --}}
                                     </div>
                                     <div style="height: 500px; background: #f3f4f6;">
@@ -63,7 +63,7 @@
                                 <div class="mb-6 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
                                     <div class="flex justify-end px-4 py-2 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
                                         <a href="{{ $fileUrl }}" download class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white hover:bg-blue-500">
-                                            ⬇ Unduh
+                                            &#11015;&#65039; Unduh
                                         </a>
                                     </div>
                                     <div class="p-4 bg-gray-50 dark:bg-gray-900/50 text-center">
@@ -72,7 +72,7 @@
                                 </div>
                             @else
                                 <a href="{{ $fileUrl }}" download class="inline-flex items-center justify-center gap-1.5 px-4 py-3 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-500 transition-all mb-2">
-                                    ⬇ Unduh
+                                    &#11015;&#65039; Unduh
                                 </a>
                             @endif
                         @endforeach

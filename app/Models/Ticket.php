@@ -220,6 +220,15 @@ class Ticket extends Model
         return $time < 8 * 60 || $time >= 17 * 60;
     }
 
+    public function getPriorityAttribute(?string $value): ?string
+    {
+        if ($value || ! $this->urgency) {
+            return $value;
+        }
+
+        return static::calculatePriority($this->impact ?? 'Medium', $this->urgency);
+    }
+
     public static function businessHoursElapsed(\Carbon\Carbon $from): float
     {
         $now = now();
@@ -281,6 +290,15 @@ class Ticket extends Model
 
     protected static function booted(): void
     {
+        static::saving(function (Ticket $ticket) {
+            if ($ticket->urgency) {
+                $ticket->priority = static::calculatePriority(
+                    $ticket->impact ?? 'Medium',
+                    $ticket->urgency,
+                );
+            }
+        });
+
         static::creating(function (Ticket $ticket) {
             $ticket->ticket_number = static::generateTicketNumber();
             $ticket->impact = $ticket->impact ?? 'Medium';
