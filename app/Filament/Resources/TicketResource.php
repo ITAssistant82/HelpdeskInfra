@@ -66,11 +66,23 @@ class TicketResource extends Resource
         if (! $user) {
             return false;
         }
-        if ($user->isStaff()) {
+
+        if ($user->hasRole('super_admin')) {
             return true;
         }
 
-        return $record && $record->requester_id === $user->id;
+        if (! $record) {
+            return false;
+        }
+
+        if ($user->isStaff()) {
+            return ($record->assigned_to === null
+                    && $record->escalationExcludedUsers()->whereKey($user->id)->doesntExist())
+                || $record->assigned_to === $user->id
+                || $record->helpers()->whereKey($user->id)->exists();
+        }
+
+        return $record->requester_id === $user->id;
     }
 
     public static function canDelete(Model $record): bool
@@ -383,7 +395,9 @@ class TicketResource extends Resource
             return $query;
         }
 
-        if ($user->hasAnyRole(['super_admin', 'admin'])) {
+        // Only super admins may see every ticket. Other staff can see tickets
+        // that are still available to their team, plus tickets assigned to them.
+        if ($user->hasRole('super_admin')) {
             return $query;
         }
 
@@ -397,13 +411,16 @@ class TicketResource extends Resource
 
                 $query->where(function ($q) use ($teamKeys, $levels, $user, $userRoleNames) {
                     $q->whereIn('team_key', $teamKeys)
-                        ->where(function ($q) use ($levels, $user) {
+                        ->whereNull('assigned_to')
+                        ->whereDoesntHave('escalationExcludedUsers', fn ($q) => $q->whereKey($user->id))
+                        ->where(function ($q) use ($levels) {
                             $q->whereNull('current_layer')
-                                ->orWhereIn('current_layer', $levels)
-                                ->orWhere('assigned_to', $user->id);
+                                ->orWhereIn('current_layer', $levels);
                         })
-                        ->orWhere(function ($q) use ($userRoleNames) {
+                        ->orWhere(function ($q) use ($userRoleNames, $user) {
                             $q->whereNull('team_key')
+                                ->whereNull('assigned_to')
+                                ->whereDoesntHave('escalationExcludedUsers', fn ($q) => $q->whereKey($user->id))
                                 ->whereIn('assigned_group', $userRoleNames);
                         })
                         ->orWhere('assigned_to', $user->id)
@@ -412,6 +429,8 @@ class TicketResource extends Resource
             } else {
                 $query->where(function ($q) use ($userRoleNames, $user) {
                     $q->whereIn('assigned_group', $userRoleNames)
+                        ->whereNull('assigned_to')
+                        ->whereDoesntHave('escalationExcludedUsers', fn ($q) => $q->whereKey($user->id))
                         ->orWhere('assigned_to', $user->id)
                         ->orWhereHas('helpers', fn ($q) => $q->where('user_id', $user->id));
                 });

@@ -98,6 +98,12 @@ class Ticket extends Model
             ->withPivot('added_by');
     }
 
+    public function escalationExcludedUsers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'ticket_escalation_exclusions', 'ticket_id', 'user_id')
+            ->withTimestamps();
+    }
+
     public function addHelper(User $user): void
     {
         $exists = $this->helpers()->where('user_id', $user->id)->exists();
@@ -151,6 +157,8 @@ class Ticket extends Model
         $next = $this->nextLayer();
         if (!$next) return;
 
+        $this->excludePreviousParticipantsFromEscalation();
+
         $this->update([
             'assigned_group' => $next->role_name,
             'current_layer' => $next->level,
@@ -159,10 +167,14 @@ class Ticket extends Model
             'assigned_to' => null,
             'team_key' => $next->team_key,
         ]);
+
+        $this->helpers()->detach();
     }
 
     public function escalateToLayer(TicketLayer $layer): void
     {
+        $this->excludePreviousParticipantsFromEscalation();
+
         $this->update([
             'assigned_group' => $layer->role_name,
             'current_layer' => $layer->level,
@@ -171,6 +183,25 @@ class Ticket extends Model
             'assigned_to' => null,
             'team_key' => $layer->team_key,
         ]);
+
+        $this->helpers()->detach();
+    }
+
+    protected function excludePreviousParticipantsFromEscalation(): void
+    {
+        $userIds = $this->helpers()->pluck('users.id');
+
+        if ($this->assigned_to) {
+            $userIds->push($this->assigned_to);
+        }
+
+        if (auth()->id()) {
+            $userIds->push(auth()->id());
+        }
+
+        $this->escalationExcludedUsers()->syncWithoutDetaching(
+            $userIds->unique()->mapWithKeys(fn (int $id) => [$id => []])->all(),
+        );
     }
 
     public function currentApproval(): ?TicketApproval
