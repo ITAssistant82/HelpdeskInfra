@@ -98,6 +98,10 @@ class AdminPanelProvider extends PanelProvider
                         Masuk dengan Microsoft
                     </a>
                 '),
+            )
+            ->renderHook(
+                'panels::footer',
+                fn () => view('components.copyright-footer'),
             );
     }
 }

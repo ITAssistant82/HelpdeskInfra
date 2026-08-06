@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 
@@ -39,5 +40,10 @@ class SoftwareRenewal extends Model
         return LogOptions::defaults()
             ->logAll()
             ->logOnlyDirty();
+    }
+
+    public function licenseSeats(): HasMany
+    {
+        return $this->hasMany(SoftwareLicenseSeat::class);
     }
 }

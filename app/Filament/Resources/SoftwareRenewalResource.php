@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\SoftwareRenewalResource\Pages;
+use App\Filament\Resources\SoftwareRenewalResource\RelationManagers;
 use App\Models\SoftwareRenewal;
 use Filament\Actions;
 use Filament\Forms;
@@ -111,6 +112,11 @@ class SoftwareRenewalResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->limit(30),
+                Tables\Columns\TextColumn::make('license_seats_count')
+                    ->label('Slot Terdaftar')
+                    ->counts('licenseSeats')
+                    ->badge()
+                    ->color('info'),
                 Tables\Columns\TextColumn::make('pic')
                     ->label('PIC')
                     ->searchable()
@@ -156,7 +162,9 @@ class SoftwareRenewalResource extends Resource
 
     public static function getRelations(): array
     {
-        return [];
+        return [
+            RelationManagers\LicenseSeatsRelationManager::class,
+        ];
     }
 
     public static function getPages(): array
