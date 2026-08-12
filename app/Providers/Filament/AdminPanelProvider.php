@@ -102,6 +102,18 @@ class AdminPanelProvider extends PanelProvider
             ->renderHook(
                 'panels::footer',
                 fn () => view('components.copyright-footer'),
+            )
+            ->renderHook(
+                'panels::topbar.end',
+                fn () => view('components.onboarding-tour-trigger'),
+            )
+            ->renderHook(
+                'panels::head.end',
+                fn () => view('components.onboarding-tour-styles'),
+            )
+            ->renderHook(
+                'panels::body.end',
+                fn () => view('components.onboarding-tour'),
             );
     }
 }
