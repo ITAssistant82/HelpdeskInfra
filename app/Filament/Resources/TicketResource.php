@@ -149,7 +149,7 @@ class TicketResource extends Resource
     {
         $isStaff = Auth::user()?->isStaff() ?? false;
 
-        return $table->columns([Tables\Columns\TextColumn::make('ticket_number')->searchable()->sortable()->html()->formatStateUsing(fn ($record) => $record?->isOutsideWorkingHours() ? $record->ticket_number . ' <span class="text-xs font-medium text-warning-600 bg-warning-100 rounded px-1 py-0.5">Out of Hours</span>' : $record->ticket_number), Tables\Columns\TextColumn::make('type')->badge()->color(fn ($state) => $state === 'Incident' ? 'danger' : 'warning')->searchable(), Tables\Columns\TextColumn::make('title')->searchable()->limit(40), Tables\Columns\TextColumn::make('category.main_category')->searchable(), Tables\Columns\TextColumn::make('assignee.name')->label('Teknisi')->placeholder('Belum ditugaskan')->visible(! $isStaff), Tables\Columns\TextColumn::make('priority')->state(fn (Ticket $record): ?string => $record->urgency ? Ticket::calculatePriority($record->impact ?? 'Medium', $record->urgency) : null)->placeholder('-')->badge()->color(fn ($state) => match ($state) {
+        return $table->poll('30s')->columns([Tables\Columns\TextColumn::make('ticket_number')->searchable()->sortable()->html()->formatStateUsing(fn ($record) => $record?->isOutsideWorkingHours() ? $record->ticket_number . ' <span class="text-xs font-medium text-warning-600 bg-warning-100 rounded px-1 py-0.5">Out of Hours</span>' : $record->ticket_number), Tables\Columns\TextColumn::make('type')->badge()->color(fn ($state) => $state === 'Incident' ? 'danger' : 'warning')->searchable(), Tables\Columns\TextColumn::make('title')->searchable()->limit(40), Tables\Columns\TextColumn::make('category.main_category')->searchable(), Tables\Columns\TextColumn::make('assignee.name')->label('Teknisi')->placeholder('Belum ditugaskan')->visible(! $isStaff), Tables\Columns\TextColumn::make('priority')->state(fn (Ticket $record): ?string => $record->urgency ? Ticket::calculatePriority($record->impact ?? 'Medium', $record->urgency) : null)->placeholder('-')->badge()->color(fn ($state) => match ($state) {
             'Critical' => 'danger', 'High' => 'warning', 'Medium' => 'info', 'Low' => 'gray', default => 'gray',
         })->visible($isStaff), Tables\Columns\TextColumn::make('status')->badge()->color(fn ($state) => match ($state) {
             'New' => 'info', 'Assigned' => 'primary', 'In Progress' => 'warning', 'Pending User', 'Pending Vendor', 'Pending Procurement' => 'gray', 'Pending Approval' => 'warning', 'Escalated' => 'danger', 'Solved' => 'success', 'Closed' => 'success', 'Reopened' => 'warning', 'Rejected/Out of Scope' => 'danger', default => 'gray',
@@ -416,6 +416,11 @@ class TicketResource extends Resource
                         ->where(function ($q) use ($levels) {
                             $q->whereNull('current_layer')
                                 ->orWhereIn('current_layer', $levels);
+                        })
+                        ->orWhere(function ($q) use ($userRoleNames, $user) {
+                            $q->whereIn('assigned_group', $userRoleNames)
+                                ->whereNull('assigned_to')
+                                ->whereDoesntHave('escalationExcludedUsers', fn ($q) => $q->whereKey($user->id));
                         })
                         ->orWhere(function ($q) use ($userRoleNames, $user) {
                             $q->whereNull('team_key')

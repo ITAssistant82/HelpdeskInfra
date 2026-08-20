@@ -31,7 +31,7 @@ class AssetStocksImport implements ToModel, WithHeadingRow, WithValidation, Skip
             'monitor'         => $row['monitor'] ?? null,
             'tahun_pembelian' => $row['tahun_pembelian'] ?? null,
             'condition'       => $row['kondisi'] ?? 'Baik',
-            'location'        => $row['lokasi'] ?? null,
+            'location'        => $row['lokasi'] ?? $row['lokasi_penyimpanan'] ?? null,
             'notes'           => $row['catatan'] ?? null,
         ]);
     }

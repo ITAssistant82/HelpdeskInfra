@@ -53,7 +53,7 @@ class AssetStocksExport implements FromQuery, WithHeadings, WithMapping, ShouldA
             'Storage (GB)',
             'Monitor',
             'Tahun Pembelian',
-            'Lokasi Penyimpanan',
+            'Lokasi',
             'Catatan',
             'Created At',
         ];
