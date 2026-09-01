@@ -25,6 +25,8 @@ class AcademicAssetsExport implements FromQuery, ShouldAutoSize, WithHeadings, W
     {
         return [
             $asset->asset_code,
+            $asset->hostname,
+            $asset->email,
             $asset->asset_type,
             $asset->brand,
             $asset->model,
@@ -49,6 +51,8 @@ class AcademicAssetsExport implements FromQuery, ShouldAutoSize, WithHeadings, W
     {
         return [
             'Asset Code',
+            'Hostname',
+            'Email',
             'Jenis Perangkat',
             'Brand',
             'Model',

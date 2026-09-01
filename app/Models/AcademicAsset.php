@@ -13,6 +13,8 @@ class AcademicAsset extends Model
 
     protected $fillable = [
         'asset_code',
+        'hostname',
+        'email',
         'room_type',
         'asset_type',
         'brand',

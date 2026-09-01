@@ -22,6 +22,8 @@ class AcademicAssetsImport implements SkipsOnFailure, ToModel, WithHeadingRow, W
         return new AcademicAsset([
             'room_type' => $this->roomType,
             'asset_code' => $row['asset_code'] ?? null,
+            'hostname' => $row['hostname'] ?? null,
+            'email' => $row['email'] ?? null,
             'asset_type' => $row['jenis_perangkat'] ?? null,
             'brand' => $row['brand'] ?? null,
             'model' => $row['model'] ?? null,
@@ -46,6 +48,8 @@ class AcademicAssetsImport implements SkipsOnFailure, ToModel, WithHeadingRow, W
     {
         return [
             'asset_code' => 'required|unique:academic_assets,asset_code',
+            'hostname' => 'nullable|string|max:255',
+            'email' => 'nullable|email|max:255',
             'jenis_perangkat' => 'required',
             'brand' => 'required',
             'model' => 'required',

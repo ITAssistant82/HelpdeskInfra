@@ -80,6 +80,8 @@ abstract class AcademicAssetResource extends Resource
 
                     return 'AKD-00001';
                 }),
+                Forms\Components\TextInput::make('hostname')->label('Hostname')->maxLength(255)->nullable(),
+                Forms\Components\TextInput::make('email')->label('Email')->email()->maxLength(255)->nullable(),
                 Forms\Components\Select::make('asset_type')->label('Jenis Perangkat')->options([
                     'PC' => 'PC',
                     'Maxhub' => 'Maxhub',
@@ -113,6 +115,8 @@ abstract class AcademicAssetResource extends Resource
     {
         return $table->defaultSort('created_at', 'desc')->columns([
             Tables\Columns\TextColumn::make('asset_code')->label('Asset Code')->searchable()->sortable(),
+            Tables\Columns\TextColumn::make('hostname')->label('Hostname')->searchable()->sortable()->placeholder('-'),
+            Tables\Columns\TextColumn::make('email')->label('Email')->searchable()->sortable()->placeholder('-'),
             Tables\Columns\TextColumn::make('asset_type')->label('Jenis Perangkat')->badge()->searchable()->sortable(),
             Tables\Columns\TextColumn::make('brand')->searchable()->sortable(),
             Tables\Columns\TextColumn::make('model')->searchable()->sortable(),
