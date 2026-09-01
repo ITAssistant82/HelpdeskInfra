@@ -38,6 +38,7 @@ class AdminPanelProvider extends PanelProvider
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->navigationGroups([
                 'Employees',
+                'Akademik',
                 'Asset Switch',
                 'Asset Access Point',
                 'Ticketing',

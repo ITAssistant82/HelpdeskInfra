@@ -14,7 +14,7 @@ class PermissionSeeder extends Seeder
             'ticket', 'ticket_category', 'ticket_layer',
             'asset_switch', 'asset_switch_bsd', 'asset_switch_cilandak',
             'asset_access_point', 'asset_access_point_bsd', 'asset_access_point_cilandak',
-            'asset_stock', 'employee', 'employee_asset',
+            'asset_stock', 'employee', 'employee_asset', 'academic_asset',
             'guide', 'activity_log', 'user', 'role', 'permission',
         ];
 
