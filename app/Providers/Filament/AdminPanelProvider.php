@@ -6,6 +6,7 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\NavigationItem;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -37,13 +38,34 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->navigationGroups([
-                'Employees',
-                'Akademik',
+                'Aset Management',
                 'Asset Switch',
                 'Asset Access Point',
                 'Ticketing',
                 'Renewal',
                 'Settings',
+            ])
+            ->navigationItems([
+                NavigationItem::make('Non Akademik')
+                    ->group('Aset Management')
+                    ->icon('heroicon-o-briefcase')
+                    ->extraAttributes([
+                        'class' => 'asset-management-nav-parent',
+                        'x-data' => '{ childrenOpen: true }',
+                        'x-bind:data-children-open' => 'childrenOpen ? \'true\' : \'false\'',
+                        'x-on:click' => 'if ($event.target.closest(\'.fi-sidebar-item-btn\') === $event.currentTarget.querySelector(\':scope > .fi-sidebar-item-btn\')) { childrenOpen = ! childrenOpen }',
+                    ])
+                    ->sort(1),
+                NavigationItem::make('Akademik')
+                    ->group('Aset Management')
+                    ->icon('heroicon-o-academic-cap')
+                    ->extraAttributes([
+                        'class' => 'asset-management-nav-parent',
+                        'x-data' => '{ childrenOpen: true }',
+                        'x-bind:data-children-open' => 'childrenOpen ? \'true\' : \'false\'',
+                        'x-on:click' => 'if ($event.target.closest(\'.fi-sidebar-item-btn\') === $event.currentTarget.querySelector(\':scope > .fi-sidebar-item-btn\')) { childrenOpen = ! childrenOpen }',
+                    ])
+                    ->sort(2),
             ])
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
@@ -111,6 +133,10 @@ class AdminPanelProvider extends PanelProvider
             ->renderHook(
                 'panels::head.end',
                 fn () => view('components.onboarding-tour-styles'),
+            )
+            ->renderHook(
+                'panels::head.end',
+                fn () => view('components.asset-management-nav-styles'),
             )
             ->renderHook(
                 'panels::body.end',

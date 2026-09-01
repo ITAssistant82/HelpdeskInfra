@@ -19,7 +19,9 @@ abstract class AcademicAssetResource extends Resource
 {
     protected static ?string $model = AcademicAsset::class;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Akademik';
+    protected static string|\UnitEnum|null $navigationGroup = 'Aset Management';
+
+    protected static ?string $navigationParentItem = 'Akademik';
 
     protected static string $roomType;
 

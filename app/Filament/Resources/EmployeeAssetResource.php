@@ -24,7 +24,9 @@ class EmployeeAssetResource extends Resource
 
     protected static ?string $navigationLabel = 'Asset Perangkat';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Employees';
+    protected static string|\UnitEnum|null $navigationGroup = 'Aset Management';
+
+    protected static ?string $navigationParentItem = 'Non Akademik';
 
     protected static ?int $navigationSort = 2;
 
