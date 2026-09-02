@@ -31,6 +31,8 @@ services:
         condition: service_healthy
     volumes:
       - storage_data:/var/www/html/storage
+    env_file:
+      - .env
     environment:
       APP_NAME: InfraDesk
       APP_ENV: local
@@ -44,6 +46,41 @@ services:
       DB_PASSWORD: root
       CACHE_STORE: file
       MICROSOFT_REDIRECT_URI: http://localhost:8080/auth/microsoft/callback
+
+  queue:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: helpdesk_queue
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+      app:
+        condition: service_started
+    volumes:
+      - storage_data:/var/www/html/storage
+    env_file:
+      - .env
+    environment:
+      APP_NAME: InfraDesk
+      APP_ENV: local
+      APP_DEBUG: true
+      APP_URL: http://localhost:8080
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: pmu_db
+      DB_USERNAME: root
+      DB_PASSWORD: root
+      CACHE_STORE: file
+    entrypoint:
+      - php
+      - artisan
+      - queue:work
+      - --sleep=3
+      - --tries=3
+      - --timeout=120
 
   nginx:
     image: nginx:alpine

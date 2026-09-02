@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Notifications\TicketNotification;
+use App\Notifications\InfrastructureTicketEmail;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -362,6 +363,11 @@ class Ticket extends Model
         });
 
         static::created(function (Ticket $ticket) {
+            static::notifyInfrastructureEmail(
+                ticket: $ticket,
+                event: 'created',
+            );
+
             $category = \App\Models\TicketCategory::with('approvers')->find($ticket->category_id);
             if ($category && $category->needs_approval) {
                 if ($category && $category->approvers->isNotEmpty()) {
@@ -411,6 +417,14 @@ class Ticket extends Model
             }
 
             if (isset($changed['current_layer']) && $changed['current_layer'] !== ($original['current_layer'] ?? null)) {
+                if ((int) $changed['current_layer'] > (int) ($original['current_layer'] ?? 0)) {
+                    static::notifyInfrastructureEmail(
+                        ticket: $ticket,
+                        event: 'escalated',
+                        previousLayer: isset($original['current_layer']) ? (int) $original['current_layer'] : null,
+                    );
+                }
+
                 $newLayer = TicketLayer::where('team_key', $ticket->team_key)
                     ->where('level', $changed['current_layer'])
                     ->first();
@@ -434,6 +448,23 @@ class Ticket extends Model
                 }
             }
         });
+    }
+
+    protected static function notifyInfrastructureEmail(Ticket $ticket, string $event, ?int $previousLayer = null): void
+    {
+        $recipient = config('tickets.notification_email');
+
+        if (blank($recipient)) {
+            return;
+        }
+
+        Notification::route('mail', $recipient)->notify(
+            new InfrastructureTicketEmail(
+                ticket: $ticket,
+                event: $event,
+                previousLayer: $previousLayer,
+            ),
+        );
     }
 
     protected static function notifyTeam(string $message, Ticket $ticket): void
