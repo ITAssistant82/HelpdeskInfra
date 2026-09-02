@@ -11,7 +11,9 @@ class UserTicketStatusChart extends ChartWidget
     protected static ?int $sort = 2;
     public static function canView(): bool
     {
-        return! auth()->user()?->isStaff();
+        $user = auth()->user();
+
+        return $user && (! $user->isStaff() || $user->hasRole('helpdesk_l1'));
     }
     protected function getData(): array
     {

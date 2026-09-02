@@ -9,7 +9,9 @@ class TicketTrendChart extends ChartWidget
 {
     public static function canView(): bool
     {
-        return auth()->user()?->isStaff() ?? false;
+        $user = auth()->user();
+
+        return $user?->isStaff() && ! $user->hasRole('helpdesk_l1');
     }
     protected ?string $heading = 'Tiket per Bulan';
     protected function getData(): array

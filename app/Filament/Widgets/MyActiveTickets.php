@@ -6,13 +6,16 @@ use App\Models\Ticket;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
+use Illuminate\Support\Facades\Auth;
 
 class MyActiveTickets extends BaseWidget
 {
     protected int| string| array $columnSpan = 'full';
     public static function canView(): bool
     {
-        return! auth()->user()?->isStaff();
+        $user = Auth::user();
+
+        return $user && (! $user->isStaff() || $user->hasRole('helpdesk_l1'));
     }
     public function table(Table $table): Table
     {
