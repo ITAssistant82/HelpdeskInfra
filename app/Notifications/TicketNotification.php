@@ -33,7 +33,7 @@ class TicketNotification extends Notification
             default => "Notifikasi: {$this->ticket->ticket_number}",
         };
 
-        return [
+        return $this->cleanPayload([
             'format' => 'filament',
             'title' => $title,
             'body' => $this->message,
@@ -42,6 +42,23 @@ class TicketNotification extends Notification
             'message' => $this->message,
             'type' => $this->type,
             'url' => "/admin/tickets/{$this->ticket->id}",
-        ];
+        ]);
+    }
+
+    private function cleanPayload(array $payload): array
+    {
+        array_walk_recursive($payload, function (&$value): void {
+            if (is_string($value)) {
+                $value = mb_scrub($value, 'UTF-8');
+            }
+        });
+
+        // Force a JSON round-trip so every value returned to Laravel is valid UTF-8.
+        return json_decode(
+            json_encode($payload, JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR),
+            true,
+            512,
+            JSON_THROW_ON_ERROR,
+        );
     }
 }

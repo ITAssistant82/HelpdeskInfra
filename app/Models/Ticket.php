@@ -432,7 +432,7 @@ class Ticket extends Model
                     $notifyUsers = User::whereHas('roles', fn ($q) => $q->where('name', $newLayer->role_name))->get();
                     Notification::send($notifyUsers, new TicketNotification(
                         ticket: $ticket,
-                        message: "Tiket {$ticket->ticket_number} dinaikkan ke {$newLayer->name} — mohon ditindaklanjuti",
+                        message: "Tiket {$ticket->ticket_number} dinaikkan ke {$newLayer->name} - mohon ditindaklanjuti",
                         type: 'escalation',
                     ));
                 }
