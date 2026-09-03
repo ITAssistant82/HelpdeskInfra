@@ -410,12 +410,14 @@ class TicketResource extends Resource
                 $levels = $userLayers->pluck('level')->unique()->values();
 
                 $query->where(function ($q) use ($teamKeys, $levels, $user, $userRoleNames) {
-                    $q->whereIn('team_key', $teamKeys)
-                        ->whereNull('assigned_to')
-                        ->whereDoesntHave('escalationExcludedUsers', fn ($q) => $q->whereKey($user->id))
-                        ->where(function ($q) use ($levels) {
-                            $q->whereNull('current_layer')
-                                ->orWhereIn('current_layer', $levels);
+                    $q->where(function ($q) use ($teamKeys, $levels, $user) {
+                        $q->whereIn('team_key', $teamKeys)
+                            ->whereNull('assigned_to')
+                            ->whereDoesntHave('escalationExcludedUsers', fn ($q) => $q->whereKey($user->id))
+                            ->where(function ($q) use ($levels) {
+                                $q->whereNull('current_layer')
+                                    ->orWhereIn('current_layer', $levels);
+                            });
                         })
                         ->orWhere(function ($q) use ($userRoleNames, $user) {
                             $q->whereIn('assigned_group', $userRoleNames)
@@ -428,6 +430,18 @@ class TicketResource extends Resource
                                 ->whereDoesntHave('escalationExcludedUsers', fn ($q) => $q->whereKey($user->id))
                                 ->whereIn('assigned_group', $userRoleNames);
                         })
+                        ->when($userRoleNames->contains('it_infra_l1'), function ($q) {
+                            $q->orWhere(function ($q) {
+                                $q->whereNull('assigned_to')
+                                    ->where(function ($q) {
+                                        $q->where('status', 'New')
+                                            ->orWhere(function ($q) {
+                                                $q->where('status', 'Escalated')
+                                                    ->where('team_key', 'it_infra');
+                                            });
+                                    });
+                            });
+                        })
                         ->orWhere('assigned_to', $user->id)
                         ->orWhereHas('helpers', fn ($q) => $q->where('user_id', $user->id));
                 });
@@ -436,6 +450,18 @@ class TicketResource extends Resource
                     $q->whereIn('assigned_group', $userRoleNames)
                         ->whereNull('assigned_to')
                         ->whereDoesntHave('escalationExcludedUsers', fn ($q) => $q->whereKey($user->id))
+                        ->when($userRoleNames->contains('it_infra_l1'), function ($q) {
+                            $q->orWhere(function ($q) {
+                                $q->whereNull('assigned_to')
+                                    ->where(function ($q) {
+                                        $q->where('status', 'New')
+                                            ->orWhere(function ($q) {
+                                                $q->where('status', 'Escalated')
+                                                    ->where('team_key', 'it_infra');
+                                            });
+                                    });
+                            });
+                        })
                         ->orWhere('assigned_to', $user->id)
                         ->orWhereHas('helpers', fn ($q) => $q->where('user_id', $user->id));
                 });
