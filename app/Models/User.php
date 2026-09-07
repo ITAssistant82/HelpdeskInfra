@@ -2,22 +2,22 @@
 
 namespace App\Models;
 
+use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
-use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable, HasRoles, LogsActivity;
+    use HasFactory, HasRoles, LogsActivity, Notifiable;
 
     protected $fillable = [
         'name',
@@ -77,10 +77,25 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasAnyRole(['super_admin', 'admin', 'helpdesk_l1', 'it_infra_l1', 'it_infra_l2', 'it_infra_l3', 'network_team', 'm365_team', 'security_soc', 'approver']);
     }
 
+    public function isITStaff(): bool
+    {
+        return $this->hasAnyRole([
+            'super_admin',
+            'admin',
+            'helpdesk_l1',
+            'it_infra_l1',
+            'it_infra_l2',
+            'it_infra_l3',
+            'network_team',
+            'm365_team',
+            'security_soc',
+        ]);
+    }
+
     protected static function booted(): void
     {
         static::created(function (User $user) {
-            if (!$user->hasAnyRole(['super_admin', 'admin', 'helpdesk_l1', 'it_infra_l1', 'it_infra_l2', 'it_infra_l3', 'network_team', 'm365_team', 'security_soc', 'approver', 'user'])) {
+            if (! $user->hasAnyRole(['super_admin', 'admin', 'helpdesk_l1', 'it_infra_l1', 'it_infra_l2', 'it_infra_l3', 'network_team', 'm365_team', 'security_soc', 'approver', 'user'])) {
                 $user->assignRole('user');
             }
         });
