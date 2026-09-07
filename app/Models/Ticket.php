@@ -2,14 +2,17 @@
 
 namespace App\Models;
 
-use App\Notifications\TicketNotification;
 use App\Notifications\InfrastructureTicketEmail;
+use App\Notifications\TicketNotification;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Notification;
+use Spatie\Permission\Models\Role;
 
 class Ticket extends Model
 {
@@ -48,7 +51,7 @@ class Ticket extends Model
 
     public function category(): BelongsTo
     {
-        return $this->belongsTo(TicketCategory::class, 'category_id');
+        return $this->belongsTo(TicketCategory::class, 'category_id')->withTrashed();
     }
 
     public function requester(): BelongsTo
@@ -108,7 +111,9 @@ class Ticket extends Model
     public function addHelper(User $user): void
     {
         $exists = $this->helpers()->where('user_id', $user->id)->exists();
-        if ($exists) return;
+        if ($exists) {
+            return;
+        }
 
         $this->helpers()->attach($user->id, ['added_by' => auth()->id()]);
 
@@ -118,9 +123,9 @@ class Ticket extends Model
             'description' => "Menambahkan {$user->name} sebagai pembantu",
         ]);
 
-        Notification::send($user, new \App\Notifications\TicketNotification(
+        Notification::send($user, new TicketNotification(
             ticket: $this,
-            message: "Anda di-summon untuk membantu tiket {$this->ticket_number} oleh " . (auth()->user()?->name ?? 'System'),
+            message: "Anda di-summon untuk membantu tiket {$this->ticket_number} oleh ".(auth()->user()?->name ?? 'System'),
             type: 'helper',
         ));
     }
@@ -138,15 +143,21 @@ class Ticket extends Model
 
     public function nextLayer(): ?TicketLayer
     {
-        if (!$this->team_key || !$this->current_layer) return null;
+        if (! $this->team_key || ! $this->current_layer) {
+            return null;
+        }
+
         return TicketLayer::where('team_key', $this->team_key)
             ->where('level', $this->current_layer + 1)
             ->first();
     }
 
-    public function higherLayers(): \Illuminate\Support\Collection
+    public function higherLayers(): Collection
     {
-        if (!$this->team_key || !$this->current_layer) return collect();
+        if (! $this->team_key || ! $this->current_layer) {
+            return collect();
+        }
+
         return TicketLayer::where('team_key', $this->team_key)
             ->where('level', '>', $this->current_layer)
             ->orderBy('level')
@@ -156,7 +167,9 @@ class Ticket extends Model
     public function escalateToNextLayer(): void
     {
         $next = $this->nextLayer();
-        if (!$next) return;
+        if (! $next) {
+            return;
+        }
 
         $this->excludePreviousParticipantsFromEscalation();
 
@@ -217,33 +230,49 @@ class Ticket extends Model
 
     public function isOverdue(): bool
     {
-        if (!$this->sla_deadline) return false;
-        if (in_array($this->status, ['Solved', 'Closed', 'Rejected/Out of Scope'])) return false;
+        if (! $this->sla_deadline) {
+            return false;
+        }
+        if (in_array($this->status, ['Solved', 'Closed', 'Rejected/Out of Scope'])) {
+            return false;
+        }
+
         return now()->gt($this->sla_deadline);
     }
 
     public function slaStatus(): string
     {
-        if (!$this->sla_deadline) return 'none';
+        if (! $this->sla_deadline) {
+            return 'none';
+        }
         if (in_array($this->status, ['Solved', 'Closed', 'Rejected/Out of Scope'])) {
             return $this->sla_achieved ? 'achieved' : 'overdue';
         }
-        if ($this->isOverdue()) return 'overdue';
+        if ($this->isOverdue()) {
+            return 'overdue';
+        }
 
         $remaining = now()->diffInSeconds($this->sla_deadline, false);
         $total = $this->created_at->diffInSeconds($this->sla_deadline);
         $pct = $total > 0 ? ($remaining / $total) : 0;
 
-        if ($pct <= 0.25) return 'warning';
+        if ($pct <= 0.25) {
+            return 'warning';
+        }
+
         return 'on_track';
     }
 
     public function isOutsideWorkingHours(): bool
     {
         $created = $this->created_at;
-        if (!$created) return false;
+        if (! $created) {
+            return false;
+        }
 
-        if ($created->isWeekend()) return true;
+        if ($created->isWeekend()) {
+            return true;
+        }
 
         $hour = (int) $created->format('H');
         $minute = (int) $created->format('i');
@@ -261,10 +290,12 @@ class Ticket extends Model
         return static::calculatePriority($this->impact ?? 'Medium', $this->urgency);
     }
 
-    public static function businessHoursElapsed(\Carbon\Carbon $from): float
+    public static function businessHoursElapsed(Carbon $from): float
     {
         $now = now();
-        if ($from->gte($now)) return 0;
+        if ($from->gte($now)) {
+            return 0;
+        }
 
         $hours = 0;
         $current = $from->copy();
@@ -272,6 +303,7 @@ class Ticket extends Model
         while ($current->lt($now)) {
             if ($current->isWeekend()) {
                 $current->startOfDay()->addDay();
+
                 continue;
             }
 
@@ -280,6 +312,7 @@ class Ticket extends Model
 
             if ($current->lt($dayStart)) {
                 $current = $dayStart;
+
                 continue;
             }
 
@@ -301,9 +334,9 @@ class Ticket extends Model
     {
         $matrix = [
             'Critical' => ['Critical' => 'Critical', 'High' => 'Critical', 'Medium' => 'High', 'Low' => 'High'],
-            'High'     => ['Critical' => 'Critical', 'High' => 'High',    'Medium' => 'High', 'Low' => 'Medium'],
-            'Medium'   => ['Critical' => 'High',     'High' => 'Medium',  'Medium' => 'Medium', 'Low' => 'Low'],
-            'Low'      => ['Critical' => 'Medium',   'High' => 'Low',     'Medium' => 'Low',   'Low' => 'Low'],
+            'High' => ['Critical' => 'Critical', 'High' => 'High',    'Medium' => 'High', 'Low' => 'Medium'],
+            'Medium' => ['Critical' => 'High',     'High' => 'Medium',  'Medium' => 'Medium', 'Low' => 'Low'],
+            'Low' => ['Critical' => 'Medium',   'High' => 'Low',     'Medium' => 'Low',   'Low' => 'Low'],
         ];
 
         return $matrix[$impact][$urgency] ?? 'Medium';
@@ -336,15 +369,15 @@ class Ticket extends Model
             $ticket->impact = $ticket->impact ?? 'Medium';
             $ticket->sla_deadline = $ticket->sla_deadline ?? now()->addDay();
 
-            if (!$ticket->assigned_group && $ticket->category_id) {
-                $category = \App\Models\TicketCategory::find($ticket->category_id);
+            if (! $ticket->assigned_group && $ticket->category_id) {
+                $category = TicketCategory::find($ticket->category_id);
                 if ($category) {
                     $ticket->assigned_group = $category->assigned_team;
                 }
             }
 
             if ($ticket->assigned_group) {
-                if (!$ticket->team_key) {
+                if (! $ticket->team_key) {
                     $layerFromGroup = TicketLayer::where('role_name', $ticket->assigned_group)->first();
                     if ($layerFromGroup) {
                         $ticket->team_key = $layerFromGroup->team_key;
@@ -368,7 +401,7 @@ class Ticket extends Model
                 event: 'created',
             );
 
-            $category = \App\Models\TicketCategory::with('approvers')->find($ticket->category_id);
+            $category = TicketCategory::with('approvers')->find($ticket->category_id);
             if ($category && $category->needs_approval) {
                 if ($category && $category->approvers->isNotEmpty()) {
                     foreach ($category->approvers as $ca) {
@@ -379,7 +412,7 @@ class Ticket extends Model
                     }
 
                     $firstStep = $category->approvers->first();
-                    if ($firstStep && \Spatie\Permission\Models\Role::where('name', $firstStep->role_name)->exists()) {
+                    if ($firstStep && Role::where('name', $firstStep->role_name)->exists()) {
                         $notifyUsers = User::whereHas('roles', fn ($q) => $q->where('name', $firstStep->role_name))->get();
                         Notification::send($notifyUsers, new TicketNotification(
                             ticket: $ticket,
@@ -495,9 +528,9 @@ class Ticket extends Model
 
     public static function generateTicketNumber(): string
     {
-        $prefix = 'IT-' . now()->format('Ymd') . '-';
+        $prefix = 'IT-'.now()->format('Ymd').'-';
         $last = static::withTrashed()
-            ->where('ticket_number', 'like', $prefix . '%')
+            ->where('ticket_number', 'like', $prefix.'%')
             ->latest('id')->first();
 
         if ($last) {
@@ -507,6 +540,6 @@ class Ticket extends Model
             $newNum = 1;
         }
 
-        return $prefix . str_pad((string) $newNum, 4, '0', STR_PAD_LEFT);
+        return $prefix.str_pad((string) $newNum, 4, '0', STR_PAD_LEFT);
     }
 }
