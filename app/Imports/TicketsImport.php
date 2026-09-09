@@ -5,6 +5,7 @@ namespace App\Imports;
 use App\Models\Ticket;
 use App\Models\TicketCategory;
 use App\Models\TicketLayer;
+use App\Models\TicketType;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
@@ -60,8 +61,8 @@ class TicketsImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
         }
 
         $type = trim((string) $row['tipe']);
-        if (! in_array($type, ['Incident', 'Service Request'], true)) {
-            $this->invalid($rowNumber, 'Tipe harus Incident atau Service Request.');
+        if (! TicketType::query()->where('name', $type)->exists()) {
+            $this->invalid($rowNumber, "Tipe '{$type}' tidak ditemukan di master Tipe Tiket.");
         }
 
         $assignedGroup = $this->nullableString($row->get('grup_penugasan')) ?: $category->assigned_team;

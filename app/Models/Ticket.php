@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Validation\ValidationException;
 use Spatie\Permission\Models\Role;
 
 class Ticket extends Model
@@ -356,6 +357,12 @@ class Ticket extends Model
     protected static function booted(): void
     {
         static::saving(function (Ticket $ticket) {
+            if ($ticket->isDirty('type') && ! TicketType::isAvailableToCurrentUser((string) $ticket->type)) {
+                throw ValidationException::withMessages([
+                    'type' => 'Tipe tiket ini tidak tersedia untuk akun Anda.',
+                ]);
+            }
+
             if ($ticket->urgency) {
                 $ticket->priority = static::calculatePriority(
                     $ticket->impact ?? 'Medium',
