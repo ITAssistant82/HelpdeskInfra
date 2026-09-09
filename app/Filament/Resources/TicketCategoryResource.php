@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\TicketCategoryResource\Pages;
+use App\Filament\Resources\TicketCategoryResource\Widgets;
 use App\Models\TicketCategory;
 use App\Models\TicketType;
 use Filament\Actions;
@@ -84,6 +85,11 @@ class TicketCategoryResource extends Resource
     public static function getRelations(): array
     {
         return [];
+    }
+
+    public static function getWidgets(): array
+    {
+        return [Widgets\TicketTypesTable::class];
     }
 
     public static function getPages(): array

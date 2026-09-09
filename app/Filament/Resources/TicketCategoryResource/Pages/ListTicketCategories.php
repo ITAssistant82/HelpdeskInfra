@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\TicketCategoryResource\Pages;
 
 use App\Filament\Resources\TicketCategoryResource;
-use App\Filament\Resources\TicketTypeResource;
+use App\Filament\Resources\TicketCategoryResource\Widgets\TicketTypesTable;
 use App\Models\TicketType;
 use Filament\Actions;
 use Filament\Forms;
@@ -15,20 +15,17 @@ class ListTicketCategories extends ListRecords
 {
     protected static string $resource = TicketCategoryResource::class;
 
+    protected function getHeaderWidgets(): array
+    {
+        return [TicketTypesTable::class];
+    }
+
     protected function getHeaderActions(): array
     {
         return [
-            Actions\Action::make('manageTicketTypes')
-                ->label('Kelola Tipe Tiket')
-                ->icon('heroicon-o-list-bullet')
-                ->color('info')
-                ->authorize(fn (): bool => Auth::user()?->isITStaff() ?? false)
-                ->visible(fn (): bool => Auth::user()?->isITStaff() ?? false)
-                ->url(fn (): string => TicketTypeResource::getUrl('index')),
             Actions\Action::make('createTicketType')
                 ->label('Tambah Tipe Tiket')
-                ->icon('heroicon-o-plus-circle')
-                ->color('gray')
+                ->color('primary')
                 ->authorize(fn (): bool => Auth::user()?->isITStaff() ?? false)
                 ->visible(fn (): bool => Auth::user()?->isITStaff() ?? false)
                 ->modalHeading('Tambah Tipe Tiket')
@@ -64,6 +61,7 @@ class ListTicketCategories extends ListRecords
                 ])
                 ->action(function (array $data): void {
                     TicketType::create($data);
+                    $this->dispatch('ticket-type-created');
 
                     Notification::make()
                         ->title('Tipe tiket berhasil ditambahkan')
