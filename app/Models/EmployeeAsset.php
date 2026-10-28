@@ -36,6 +36,7 @@ class EmployeeAsset extends Model
         'processor',
         'memory_gb',
         'hard_drive_gb',
+        'ssd_gb',
         'monitor',
         'tahun_pembelian',
         'serial_number',
@@ -48,6 +49,20 @@ class EmployeeAsset extends Model
     protected $casts = [
         'assigned_at' => 'date',
     ];
+
+    public function getStorageSummaryAttribute(): string
+    {
+        $storage = [];
+
+        if ($this->ssd_gb) {
+            $storage[] = 'SSD: '.$this->ssd_gb.' GB';
+        }
+        if ($this->hard_drive_gb) {
+            $storage[] = 'Harddisk: '.$this->hard_drive_gb.' GB';
+        }
+
+        return implode(' | ', $storage);
+    }
 
     public function employee(): BelongsTo
     {

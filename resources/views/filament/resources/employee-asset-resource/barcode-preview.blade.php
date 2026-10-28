@@ -210,11 +210,11 @@
                 </div>
                 @endif
                 @endif
-                @if ($asset->os || $asset->processor || $asset->memory_gb || $asset->hard_drive_gb)
+                @if ($asset->os || $asset->processor || $asset->memory_gb || $asset->storage_summary)
                 <div class="info-box full">
                     <div class="label">Spesifikasi</div>
                     <div class="value" style="font-size:12px;">
-                        {{ $asset->os ? 'OS: '.$asset->os : '' }}{{ $asset->processor ? ' | CPU: '.$asset->processor : '' }}{{ $asset->memory_gb ? ' | RAM: '.$asset->memory_gb.'GB' : '' }}{{ $asset->hard_drive_gb ? ' | Storage: '.$asset->hard_drive_gb.'GB' : '' }}
+                        {{ $asset->os ? 'OS: '.$asset->os : '' }}{{ $asset->processor ? ' | CPU: '.$asset->processor : '' }}{{ $asset->memory_gb ? ' | RAM: '.$asset->memory_gb.'GB' : '' }}{{ $asset->storage_summary ? ' | '.$asset->storage_summary : '' }}
                     </div>
                 </div>
                 @endif

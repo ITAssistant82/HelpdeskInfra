@@ -175,10 +175,10 @@
                 <td class="value">{{ $asset->memory_gb }} GB</td>
             </tr>
             @endif
-            @if ($asset->hard_drive_gb)
+            @if ($asset->storage_summary)
             <tr>
                 <td class="label">Storage</td>
-                <td class="value">{{ $asset->hard_drive_gb }} GB</td>
+                <td class="value">{{ $asset->storage_summary }}</td>
             </tr>
             @endif
             @if ($asset->assigned_at)

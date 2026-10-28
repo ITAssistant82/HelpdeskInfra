@@ -50,7 +50,7 @@ class AssetBarcodeController extends Controller
         if ($asset->os) $specs[] = $asset->os;
         if ($asset->processor) $specs[] = $asset->processor;
         if ($asset->memory_gb) $specs[] = $asset->memory_gb . 'GB';
-        if ($asset->hard_drive_gb) $specs[] = $asset->hard_drive_gb . 'GB';
+        if ($asset->storage_summary) $specs[] = $asset->storage_summary;
         if ($specs) {
             $lines[] = 'Specs: ' . implode(' | ', $specs);
         }
@@ -466,7 +466,7 @@ class AssetBarcodeController extends Controller
         if ($asset->os) $specs[] = $asset->os;
         if ($asset->processor) $specs[] = $asset->processor;
         if ($asset->memory_gb) $specs[] = $asset->memory_gb . 'GB';
-        if ($asset->hard_drive_gb) $specs[] = $asset->hard_drive_gb . 'GB';
+        if ($asset->storage_summary) $specs[] = $asset->storage_summary;
         if ($specs) {
             $lines[] = 'Specs: ' . implode(' | ', $specs);
         }

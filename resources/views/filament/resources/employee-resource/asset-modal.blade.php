@@ -98,7 +98,7 @@
                         </td>
                     </tr>
                     @endif
-                    @if ($asset->memory_gb || $asset->hard_drive_gb)
+                    @if ($asset->memory_gb || $asset->storage_summary)
                     <tr>
                         <td style="padding: 8px 10px 8px 14px; border-bottom: 1px solid #f3f4f6; border-right: 1px solid #f3f4f6;">
                             <span style="color: #9ca3af; display: block; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">RAM</span>
@@ -106,7 +106,7 @@
                         </td>
                         <td style="padding: 8px 14px 8px 10px; border-bottom: 1px solid #f3f4f6;">
                             <span style="color: #9ca3af; display: block; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Storage</span>
-                            <span style="color: #111827; font-weight: 600;">{{ $asset->hard_drive_gb ? $asset->hard_drive_gb . ' GB' : '-' }}</span>
+                            <span style="color: #111827; font-weight: 600;">{{ $asset->storage_summary ? $asset->storage_summary : '-' }}</span>
                         </td>
                     </tr>
                     @endif

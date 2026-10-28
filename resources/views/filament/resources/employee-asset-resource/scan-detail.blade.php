@@ -439,7 +439,7 @@
                 </div>
 
                 <!-- Hardware Specs -->
-                @if ($asset->os || $asset->processor || $asset->memory_gb || $asset->hard_drive_gb || $asset->monitor || $asset->mainboard)
+                @if ($asset->os || $asset->processor || $asset->memory_gb || $asset->storage_summary || $asset->monitor || $asset->mainboard)
                 <div class="section">
                     <div class="section-title">
                         <div class="section-icon"></div>
@@ -464,10 +464,10 @@
                             <span class="spec-value">{{ $asset->memory_gb }} GB</span>
                         </div>
                         @endif
-                        @if ($asset->hard_drive_gb)
+                        @if ($asset->storage_summary)
                         <div class="spec-item">
                             <span class="spec-label">Storage</span>
-                            <span class="spec-value">{{ $asset->hard_drive_gb }} GB</span>
+                            <span class="spec-value">{{ $asset->storage_summary }}</span>
                         </div>
                         @endif
                         @if ($asset->monitor)
