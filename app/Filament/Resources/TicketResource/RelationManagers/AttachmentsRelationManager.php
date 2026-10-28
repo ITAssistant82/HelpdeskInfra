@@ -24,7 +24,7 @@ class AttachmentsRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema->schema([Forms\Components\FileUpload::make('file_path')->label('File')->disk('public')->directory('ticket-attachments')->preserveFilenames()->required()->columnSpanFull()]);
+        return $schema->schema([Forms\Components\FileUpload::make('file_path')->label('File')->disk('public')->directory('ticket-attachments')->required()->columnSpanFull()]);
     }
 
     public function table(Table $table): Table
